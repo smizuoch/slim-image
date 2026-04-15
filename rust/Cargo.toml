@@ -1,0 +1,20 @@
+[package]
+name = "slim_image_wasm"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+console_error_panic_hook = "0.1.7"
+jpeg-encoder = "0.7.0"
+png = "0.18.1"
+serde = { version = "1.0", features = ["derive"] }
+serde-wasm-bindgen = "0.6.5"
+wasm-bindgen = "0.2.105"
+webp-rust = "0.2.1"
+
+[dev-dependencies]
+approx = "0.5.1"

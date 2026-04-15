@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>slim-image unit tests</title>
+  <style>
+    body {
+      font-family: ui-sans-serif, system-ui, sans-serif;
+      margin: 0;
+      padding: 32px;
+      background: #f3f5f8;
+      color: #1f1f21;
+    }
+
+    main {
+      width: min(720px, 100%);
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.08);
+    }
+
+    ul {
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 12px;
+    }
+
+    li {
+      border-radius: 12px;
+      padding: 14px 16px;
+      background: #eff4fb;
+    }
+
+    li[data-status="fail"] {
+      background: #ffecec;
+      color: #b42318;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Unit Test Runner</h1>
+    <p>このページは純粋関数の JS テストをブラウザだけで実行します。</p>
+    <ul id="results"></ul>
+  </main>
+  <script type="module" src="./runner.js"></script>
+</body>
+</html>

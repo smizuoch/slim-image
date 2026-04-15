@@ -1,0 +1,54 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body,
+button,
+input,
+select {
+  font: inherit;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+button {
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+input,
+select {
+  border: 0;
+  outline: none;
+}
+
+ol,
+ul,
+p,
+h1,
+h2,
+h3,
+dl,
+dd,
+dt {
+  margin: 0;
+  padding: 0;
+}
+
+ul,
+ol {
+  list-style: none;
+}

@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>画像最適化ツール | 目標サイズ以下で最高画質</title>
+  <meta name="description" content="PNG・JPEG・WebP をブラウザだけで最適化。画像を外部へ送らず、目標サイズ以下で最高画質を狙う完全静的サイトです。" />
+  <meta name="robots" content="index, follow, max-image-preview:large" />
+  <meta name="author" content="smizuoch" />
+  <meta name="application-name" content="slim-image" />
+  <meta name="theme-color" content="#2563ff" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="ja_JP" />
+  <meta property="og:site_name" content="slim-image" />
+  <meta property="og:title" content="画像最適化ツール | 目標サイズ以下で最高画質" />
+  <meta property="og:description" content="PNG・JPEG・WebP をブラウザ内だけで最適化し、目標サイズ以下で最高画質の候補を探索します。" />
+
+  <script>
+    (() => {
+      const storageKey = 'slim-image-theme';
+      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      let theme = systemTheme;
+      try {
+        const savedTheme = localStorage.getItem(storageKey);
+        if (savedTheme === 'light' || savedTheme === 'dark') {
+          theme = savedTheme;
+        }
+      } catch {
+        theme = systemTheme;
+      }
+      document.documentElement.dataset.theme = theme;
+      const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+      if (themeColorMeta) {
+        themeColorMeta.content = theme === 'dark' ? '#101725' : '#2563ff';
+      }
+    })();
+  </script>
+
+  <link rel="stylesheet" href="./assets/css/reset.css" />
+  <link rel="stylesheet" href="./assets/css/base.css" />
+  <link rel="stylesheet" href="./assets/css/layout.css" />
+  <link rel="stylesheet" href="./assets/css/components.css" />
+</head>
+<body>
+  <main>
+    <div class="app-shell">
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="ダークモードに切り替え" title="ダークモードに切り替え">
+        <svg class="theme-icon-moon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M20 14.2A7.8 7.8 0 0 1 9.8 4a8.6 8.6 0 1 0 10.2 10.2Z" />
+        </svg>
+        <svg class="theme-icon-sun" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="4" />
+          <path d="M12 2.5V5.2M12 18.8v2.7M21.5 12h-2.7M5.2 12H2.5M18.7 5.3l-1.9 1.9M7.2 16.8l-1.9 1.9M18.7 18.7l-1.9-1.9M7.2 7.2 5.3 5.3" />
+        </svg>
+      </button>
+
+      <section class="dialog" aria-labelledby="pageTitle">
+        <section class="workspace">
+          <label class="dropzone" id="dropzone" tabindex="0" aria-label="画像をアップロード">
+            <input class="sr-only" id="fileInput" type="file" accept="image/jpeg,image/png,image/webp" />
+            <div id="dropzoneContent">
+              <div class="dropzone-icon" aria-hidden="true">
+                <svg viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="18" y="38" width="72" height="54" rx="16" style="stroke: var(--illustration-stroke);" stroke-width="5" />
+                  <path d="M18 76.5L40 54L58 71L70 59L90 80" style="stroke: var(--illustration-stroke);" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+                  <circle cx="72" cy="54" r="8" style="stroke: var(--illustration-stroke);" stroke-width="5" />
+                  <path d="M82 22H108C113.523 22 118 26.4772 118 32V86C118 91.5228 113.523 96 108 96H96" style="stroke: var(--illustration-accent);" stroke-width="18" stroke-linecap="round" opacity="0.85" />
+                </svg>
+                <div class="dropzone-plus">+</div>
+              </div>
+              <p class="dropzone-title">画像をドラッグ＆ドロップ または <span class="link">参照</span></p>
+              <p class="dropzone-help">PNG / JPEG / WebP、500 MB 以下。画像はブラウザ外へ送信されません。</p>
+            </div>
+          </label>
+
+          <div class="editor-layout hidden" id="editorLayout">
+            <div class="preview-grid">
+              <article class="preview-card">
+                <div class="preview-card-head">
+                  <div>
+                    <h2>Before</h2>
+                    <p>元画像</p>
+                  </div>
+                  <span class="preview-chip" id="inputFormatChip">--</span>
+                </div>
+                <div class="preview-stage">
+                  <img class="preview-image" id="beforePreview" alt="元画像プレビュー" />
+                </div>
+                <div class="preview-caption" id="beforeCaption">画像を読み込むと元画像の情報を表示します。</div>
+              </article>
+
+              <article class="preview-card">
+                <div class="preview-card-head">
+                  <div>
+                    <h2>After</h2>
+                    <p>最適化結果</p>
+                  </div>
+                  <span class="preview-chip" id="outputFormatChip">--</span>
+                </div>
+                <div class="preview-stage">
+                  <img class="preview-image" id="afterPreview" alt="最適化後プレビュー" />
+                  <div class="preview-empty" id="afterPlaceholder">最適化後のプレビューがここに表示されます</div>
+                </div>
+                <div class="preview-caption" id="afterCaption">まだ最適化は実行されていません。</div>
+              </article>
+            </div>
+
+            <div class="workspace-panels">
+              <section class="info-card">
+                <div class="card-head">
+                  <h3>処理状況</h3>
+                  <span class="card-note" id="progressLabel">待機中</span>
+                </div>
+                <div class="progress-bar" aria-hidden="true">
+                  <div class="progress-bar-fill" id="progressBarFill"></div>
+                </div>
+                <dl class="mini-stats">
+                  <div>
+                    <dt>試行候補</dt>
+                    <dd id="attemptCount">0</dd>
+                  </div>
+                  <div>
+                    <dt>探索分岐</dt>
+                    <dd id="branchLabel">--</dd>
+                  </div>
+                  <div>
+                    <dt>Pareto</dt>
+                    <dd id="paretoCount">0</dd>
+                  </div>
+                </dl>
+              </section>
+
+              <section class="info-card">
+                <div class="card-head">
+                  <h3>詳細ログ</h3>
+                  <span class="card-note">最大 80 行</span>
+                </div>
+                <ol class="log-list" id="logList"></ol>
+              </section>
+            </div>
+          </div>
+        </section>
+
+        <aside class="side-panel">
+          <h1 class="panel-title" id="pageTitle">画像最適化ツール</h1>
+          <p class="panel-description">画像の幅・高さと拡張子を変えずに、目標サイズ以下で最高画質の候補を探索します。処理はすべてブラウザ内だけで完結します。</p>
+          <hr class="divider" />
+
+          <div class="stack">
+            <div class="field">
+              <label for="targetSizeInput">目標サイズ</label>
+              <div class="target-row">
+                <input class="text-input" id="targetSizeInput" type="number" min="1" step="0.1" inputmode="decimal" value="10" />
+                <select class="select target-unit" id="targetSizeUnit">
+                  <option value="MB" selected>MB</option>
+                  <option value="KB">KB</option>
+                </select>
+              </div>
+              <p class="field-help">指定したサイズ以下で、品質スコアが最大になる候補を探します。</p>
+            </div>
+
+            <div class="button-row">
+              <button class="secondary" id="replaceButton" type="button">画像を差し替え</button>
+              <button class="primary" id="optimizeButton" type="button">最適化を開始</button>
+            </div>
+
+            <div class="button-row button-row-single">
+              <button class="primary primary-wide" id="downloadButton" type="button" disabled>ダウンロード</button>
+            </div>
+
+            <div class="status-note" id="statusNote">画像を読み込むと、ここに最適化状況を表示します。</div>
+            <div class="error-note hidden" id="errorNote" role="alert"></div>
+
+            <section class="field">
+              <div class="card-head">
+                <h2 class="field-title">元画像情報</h2>
+                <span class="card-note">入力</span>
+              </div>
+              <dl class="meta-grid" id="sourceMeta">
+                <div><dt>拡張子</dt><dd>--</dd></div>
+                <div><dt>幅</dt><dd>--</dd></div>
+                <div><dt>高さ</dt><dd>--</dd></div>
+                <div><dt>元サイズ</dt><dd>--</dd></div>
+                <div><dt>透過</dt><dd>--</dd></div>
+              </dl>
+            </section>
+
+            <section class="field">
+              <div class="card-head">
+                <h2 class="field-title">最適化後情報</h2>
+                <span class="card-note">出力</span>
+              </div>
+              <dl class="meta-grid" id="resultMeta">
+                <div><dt>出力サイズ</dt><dd>--</dd></div>
+                <div><dt>圧縮率</dt><dd>--</dd></div>
+                <div><dt>出力形式</dt><dd>--</dd></div>
+                <div><dt>品質スコア</dt><dd>--</dd></div>
+                <div><dt>採用パラメータ</dt><dd>--</dd></div>
+              </dl>
+            </section>
+
+            <section class="field">
+              <div class="card-head">
+                <h2 class="field-title">探索アルゴリズム</h2>
+                <span class="card-note">形式別</span>
+              </div>
+              <ul class="feature-list">
+                <li>JPEG: subsampling ごとに二分探索し、近傍を局所再探索</li>
+                <li>WebP: lossless → lossy / alpha-safe quantized lossless の順で探索</li>
+                <li>PNG: lossless pass → 粗探索 → Pareto front → 局所探索</li>
+                <li>RGBA: 背景合成込みの alpha-aware score を利用</li>
+              </ul>
+            </section>
+          </div>
+        </aside>
+      </section>
+    </div>
+
+    <section class="seo-section" aria-labelledby="toolSummaryTitle">
+      <div class="seo-card">
+        <div class="seo-grid">
+          <div>
+            <p class="seo-kicker">Completely Static Site</p>
+            <h2 class="seo-heading" id="toolSummaryTitle">GitHub Pages にそのまま載せられる画像最適化ツール</h2>
+            <p class="seo-text">このツールは HTML / CSS / JavaScript / Rust-WASM のみで構成された完全静的サイトです。サーバーアップロード、外部 API、Node.js 本番依存はありません。</p>
+            <p class="seo-text">PNG / JPEG / WebP を対象に、幅・高さと拡張子を変えず、目標サイズ以下の制約内で品質スコアが最大になる候補を探索します。</p>
+          </div>
+          <div>
+            <h3 class="seo-subtitle">主な仕様</h3>
+            <ul class="seo-list">
+              <li>ドラッグ＆ドロップとファイル選択に対応</li>
+              <li>Before / After プレビューと詳細ログ表示</li>
+              <li>処理は Web Worker + WASM で実行</li>
+              <li>PNG の透過 / WebP の透過 / JPEG の形式維持</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <noscript>
+    <p class="noscript-note">このツールの利用には JavaScript が必要です。</p>
+  </noscript>
+
+  <script type="module" src="./assets/js/app.js"></script>
+</body>
+</html>

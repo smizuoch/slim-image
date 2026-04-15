@@ -1,0 +1,118 @@
+.app-shell {
+  position: relative;
+  min-height: 100vh;
+  padding: 24px;
+  display: grid;
+  place-items: center;
+}
+
+.dialog {
+  position: relative;
+  width: min(1220px, calc(100vw - 32px));
+  min-height: min(760px, calc(100vh - 32px));
+  background: var(--panel);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  display: grid;
+  grid-template-columns: minmax(0, 1.72fr) minmax(360px, 420px);
+}
+
+.workspace {
+  background: var(--workspace-bg);
+  padding: 28px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.editor-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-height: 100%;
+}
+
+.preview-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.workspace-panels {
+  display: grid;
+  grid-template-columns: minmax(0, 280px) minmax(0, 1fr);
+  gap: 20px;
+}
+
+.side-panel {
+  background: var(--side-panel-bg);
+  padding: 30px 26px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  border-left: 1px solid var(--line);
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.seo-section {
+  width: min(1220px, calc(100vw - 32px));
+  margin: 24px auto 64px;
+}
+
+.seo-card {
+  background: var(--seo-card-bg);
+  border: 1px solid var(--seo-card-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--seo-shadow);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  padding: 28px;
+}
+
+.seo-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 28px;
+}
+
+@media (max-width: 1120px) {
+  .dialog {
+    grid-template-columns: 1fr;
+  }
+
+  .side-panel {
+    border-left: 0;
+    border-top: 1px solid var(--line);
+  }
+}
+
+@media (max-width: 860px) {
+  .app-shell {
+    padding: 16px;
+  }
+
+  .dialog {
+    width: min(100vw - 16px, 1220px);
+  }
+
+  .workspace {
+    padding: 18px;
+  }
+
+  .preview-grid,
+  .workspace-panels,
+  .seo-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .side-panel {
+    padding: 22px 18px 18px;
+  }
+}
