@@ -106,39 +106,6 @@
               </article>
             </div>
 
-            <div class="workspace-panels">
-              <section class="info-card">
-                <div class="card-head">
-                  <h3>処理状況</h3>
-                  <span class="card-note" id="progressLabel">待機中</span>
-                </div>
-                <div class="progress-bar" aria-hidden="true">
-                  <div class="progress-bar-fill" id="progressBarFill"></div>
-                </div>
-                <dl class="mini-stats">
-                  <div>
-                    <dt>試行候補</dt>
-                    <dd id="attemptCount">0</dd>
-                  </div>
-                  <div>
-                    <dt>探索分岐</dt>
-                    <dd id="branchLabel">--</dd>
-                  </div>
-                  <div>
-                    <dt>Pareto</dt>
-                    <dd id="paretoCount">0</dd>
-                  </div>
-                </dl>
-              </section>
-
-              <section class="info-card">
-                <div class="card-head">
-                  <h3>詳細ログ</h3>
-                  <span class="card-note">最大 80 行</span>
-                </div>
-                <ol class="log-list" id="logList"></ol>
-              </section>
-            </div>
           </div>
         </section>
 
@@ -172,46 +139,6 @@
             <div class="status-note" id="statusNote">画像を読み込むと、ここに最適化状況を表示します。</div>
             <div class="error-note hidden" id="errorNote" role="alert"></div>
 
-            <section class="field">
-              <div class="card-head">
-                <h2 class="field-title">元画像情報</h2>
-                <span class="card-note">入力</span>
-              </div>
-              <dl class="meta-grid" id="sourceMeta">
-                <div><dt>拡張子</dt><dd>--</dd></div>
-                <div><dt>幅</dt><dd>--</dd></div>
-                <div><dt>高さ</dt><dd>--</dd></div>
-                <div><dt>元サイズ</dt><dd>--</dd></div>
-                <div><dt>透過</dt><dd>--</dd></div>
-              </dl>
-            </section>
-
-            <section class="field">
-              <div class="card-head">
-                <h2 class="field-title">最適化後情報</h2>
-                <span class="card-note">出力</span>
-              </div>
-              <dl class="meta-grid" id="resultMeta">
-                <div><dt>出力サイズ</dt><dd>--</dd></div>
-                <div><dt>圧縮率</dt><dd>--</dd></div>
-                <div><dt>出力形式</dt><dd>--</dd></div>
-                <div><dt>品質スコア</dt><dd>--</dd></div>
-                <div><dt>採用パラメータ</dt><dd>--</dd></div>
-              </dl>
-            </section>
-
-            <section class="field">
-              <div class="card-head">
-                <h2 class="field-title">探索アルゴリズム</h2>
-                <span class="card-note">形式別</span>
-              </div>
-              <ul class="feature-list">
-                <li>JPEG: subsampling ごとに二分探索し、近傍を局所再探索</li>
-                <li>WebP: lossless → lossy / alpha-safe quantized lossless の順で探索</li>
-                <li>PNG: lossless pass → 粗探索 → Pareto front → 局所探索</li>
-                <li>RGBA: 背景合成込みの alpha-aware score を利用</li>
-              </ul>
-            </section>
           </div>
         </aside>
       </section>
