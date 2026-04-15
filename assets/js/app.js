@@ -75,6 +75,25 @@ function handleTargetChanged(patch) {
 }
 
 async function handleOptimizeRequested() {
+  await optimizeAndMaybeDownload(false);
+}
+
+async function handleDownloadRequested() {
+  if (!state.source) {
+    updateState(setError(state, '先に画像を読み込んでください。'));
+    return;
+  }
+  if (state.isBusy) {
+    return;
+  }
+  if (state.result?.downloadable) {
+    downloadCurrentResult();
+    return;
+  }
+  await optimizeAndMaybeDownload(true);
+}
+
+async function optimizeAndMaybeDownload(downloadAfterOptimize) {
   if (!state.source) {
     updateState(setError(state, '先に画像を読み込んでください。'));
     return;
@@ -88,6 +107,9 @@ async function handleOptimizeRequested() {
   if (targetBytes >= state.source.size) {
     const result = makePassthroughResult(state.source);
     updateState(setResult(clearLogs(state), result, 'すでに条件を満たしているため、元画像をそのまま保持します。'));
+    if (downloadAfterOptimize) {
+      downloadCurrentResult();
+    }
     return;
   }
 
@@ -121,13 +143,16 @@ async function handleOptimizeRequested() {
     });
     const result = buildWorkerResult(resultPayload, state.source);
     updateState(setResult(state, result, result.message));
+    if (downloadAfterOptimize && result.downloadable) {
+      downloadCurrentResult();
+    }
   } catch (error) {
     updateState(setError(state, error.message));
   }
 }
 
-function handleDownloadRequested() {
-  if (!state.result?.downloadable) {
+function downloadCurrentResult() {
+  if (!state.source || !state.result?.downloadable) {
     return;
   }
   downloadBlob(state.result.blob, buildOutputName(state.source.name, state.result.outputType));

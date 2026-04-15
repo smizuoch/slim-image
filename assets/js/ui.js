@@ -119,7 +119,7 @@ function render(elements, state) {
     elements.replaceButton.disabled = state.isBusy;
   }
   if (elements.downloadButton) {
-    elements.downloadButton.disabled = !state.result?.downloadable;
+    elements.downloadButton.disabled = !hasSource || state.isBusy;
   }
 
   if (elements.progressLabel) {
