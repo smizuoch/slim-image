@@ -50,6 +50,10 @@ function collectElements() {
 }
 
 function bindEvents(elements, actions) {
+  if (!elements.dropzone || !elements.fileInput) {
+    return;
+  }
+
   elements.dropzone.addEventListener('click', () => elements.fileInput.click());
   elements.dropzone.addEventListener('keydown', (event) => {
     if (event.key === 'Enter' || event.key === ' ') {
@@ -85,40 +89,66 @@ function bindEvents(elements, actions) {
     }
   });
 
-  elements.replaceButton.addEventListener('click', () => elements.fileInput.click());
-  elements.optimizeButton.addEventListener('click', actions.onOptimizeRequested);
-  elements.downloadButton.addEventListener('click', actions.onDownloadRequested);
-  elements.targetSizeInput.addEventListener('input', (event) => {
+  elements.replaceButton?.addEventListener('click', () => elements.fileInput.click());
+  elements.optimizeButton?.addEventListener('click', actions.onOptimizeRequested);
+  elements.downloadButton?.addEventListener('click', actions.onDownloadRequested);
+  elements.targetSizeInput?.addEventListener('input', (event) => {
     actions.onTargetChanged({ value: event.target.value });
   });
-  elements.targetSizeUnit.addEventListener('change', (event) => {
+  elements.targetSizeUnit?.addEventListener('change', (event) => {
     actions.onTargetChanged({ unit: event.target.value });
   });
-  elements.themeToggle.addEventListener('click', () => toggleTheme(elements.themeToggle));
+  elements.themeToggle?.addEventListener('click', () => toggleTheme(elements.themeToggle));
 }
 
 function render(elements, state) {
   const hasSource = Boolean(state.source);
-  elements.dropzone.classList.toggle('hidden', hasSource);
-  elements.editorLayout.classList.toggle('hidden', !hasSource);
+  elements.dropzone?.classList.toggle('hidden', hasSource);
+  elements.editorLayout?.classList.toggle('hidden', !hasSource);
 
-  elements.targetSizeInput.value = state.target.value;
-  elements.targetSizeUnit.value = state.target.unit;
-  elements.optimizeButton.disabled = !hasSource || state.isBusy;
-  elements.replaceButton.disabled = state.isBusy;
-  elements.downloadButton.disabled = !state.result?.downloadable;
+  if (elements.targetSizeInput) {
+    elements.targetSizeInput.value = state.target.value;
+  }
+  if (elements.targetSizeUnit) {
+    elements.targetSizeUnit.value = state.target.unit;
+  }
+  if (elements.optimizeButton) {
+    elements.optimizeButton.disabled = !hasSource || state.isBusy;
+  }
+  if (elements.replaceButton) {
+    elements.replaceButton.disabled = state.isBusy;
+  }
+  if (elements.downloadButton) {
+    elements.downloadButton.disabled = !state.result?.downloadable;
+  }
 
-  elements.progressLabel.textContent = state.progress.label;
-  elements.progressBarFill.style.width = `${Math.round((state.progress.ratio || 0) * 100)}%`;
-  elements.attemptCount.textContent = String(state.progress.attempts || 0);
-  elements.branchLabel.textContent = state.progress.branch || '--';
-  elements.paretoCount.textContent = String(state.progress.paretoCount || 0);
+  if (elements.progressLabel) {
+    elements.progressLabel.textContent = state.progress.label;
+  }
+  if (elements.progressBarFill) {
+    elements.progressBarFill.style.width = `${Math.round((state.progress.ratio || 0) * 100)}%`;
+  }
+  if (elements.attemptCount) {
+    elements.attemptCount.textContent = String(state.progress.attempts || 0);
+  }
+  if (elements.branchLabel) {
+    elements.branchLabel.textContent = state.progress.branch || '--';
+  }
+  if (elements.paretoCount) {
+    elements.paretoCount.textContent = String(state.progress.paretoCount || 0);
+  }
 
   if (state.source) {
-    elements.beforePreview.src = state.source.previewUrl;
-    elements.beforePreview.alt = `${state.source.name} の元画像プレビュー`;
-    elements.beforeCaption.textContent = summarizeBefore(state.source);
-    elements.inputFormatChip.textContent = state.source.typeLabel;
+    if (elements.beforePreview) {
+      elements.beforePreview.src = state.source.previewUrl;
+      elements.beforePreview.alt = `${state.source.name} の元画像プレビュー`;
+    }
+    if (elements.beforeCaption) {
+      elements.beforeCaption.textContent = summarizeBefore(state.source);
+    }
+    if (elements.inputFormatChip) {
+      elements.inputFormatChip.textContent = state.source.typeLabel;
+    }
     fillDefinitionList(elements.sourceMeta, [
       state.source.extension,
       `${state.source.width}px`,
@@ -127,9 +157,13 @@ function render(elements, state) {
       state.source.hasAlpha ? 'あり' : 'なし',
     ]);
   } else {
-    elements.beforePreview.removeAttribute('src');
-    elements.beforeCaption.textContent = summarizeBefore(null);
-    elements.inputFormatChip.textContent = '--';
+    elements.beforePreview?.removeAttribute('src');
+    if (elements.beforeCaption) {
+      elements.beforeCaption.textContent = summarizeBefore(null);
+    }
+    if (elements.inputFormatChip) {
+      elements.inputFormatChip.textContent = '--';
+    }
     fillDefinitionList(elements.sourceMeta, ['--', '--', '--', '--', '--']);
   }
 
@@ -143,32 +177,49 @@ function render(elements, state) {
   ]);
 
   if (state.result?.previewUrl) {
-    elements.afterPreview.src = state.result.previewUrl;
-    elements.afterPreview.alt = `${state.result.outputTypeLabel} 形式の最適化結果プレビュー`;
-    elements.afterPlaceholder.classList.add('hidden');
-    elements.outputFormatChip.textContent = state.result.outputTypeLabel;
+    if (elements.afterPreview) {
+      elements.afterPreview.src = state.result.previewUrl;
+      elements.afterPreview.alt = `${state.result.outputTypeLabel} 形式の最適化結果プレビュー`;
+    }
+    elements.afterPlaceholder?.classList.add('hidden');
+    if (elements.outputFormatChip) {
+      elements.outputFormatChip.textContent = state.result.outputTypeLabel;
+    }
   } else {
-    elements.afterPreview.removeAttribute('src');
-    elements.afterPlaceholder.classList.remove('hidden');
-    elements.outputFormatChip.textContent = '--';
+    elements.afterPreview?.removeAttribute('src');
+    elements.afterPlaceholder?.classList.remove('hidden');
+    if (elements.outputFormatChip) {
+      elements.outputFormatChip.textContent = '--';
+    }
   }
-  elements.afterCaption.textContent = summarizeAfter(state.source, state.result);
+  if (elements.afterCaption) {
+    elements.afterCaption.textContent = summarizeAfter(state.source, state.result);
+  }
 
-  elements.logList.innerHTML = state.logs
-    .map((entry) => `<li data-level="${entry.level}">${escapeHtml(entry.message)}</li>`)
-    .join('');
+  if (elements.logList) {
+    elements.logList.innerHTML = state.logs
+      .map((entry) => `<li data-level="${entry.level}">${escapeHtml(entry.message)}</li>`)
+      .join('');
+  }
 
-  elements.statusNote.textContent = state.status;
-  if (state.error) {
-    elements.errorNote.textContent = state.error;
-    elements.errorNote.classList.remove('hidden');
-  } else {
-    elements.errorNote.textContent = '';
-    elements.errorNote.classList.add('hidden');
+  if (elements.statusNote) {
+    elements.statusNote.textContent = state.status;
+  }
+  if (elements.errorNote) {
+    if (state.error) {
+      elements.errorNote.textContent = state.error;
+      elements.errorNote.classList.remove('hidden');
+    } else {
+      elements.errorNote.textContent = '';
+      elements.errorNote.classList.add('hidden');
+    }
   }
 }
 
 function fillDefinitionList(container, values) {
+  if (!container) {
+    return;
+  }
   const items = container.querySelectorAll('dd');
   values.forEach((value, index) => {
     if (items[index]) {
@@ -178,6 +229,9 @@ function fillDefinitionList(container, values) {
 }
 
 function syncThemeToggle(toggle) {
+  if (!toggle) {
+    return;
+  }
   const themeMedia = window.matchMedia('(prefers-color-scheme: dark)');
   const themeColorMeta = document.querySelector('meta[name="theme-color"]');
 
